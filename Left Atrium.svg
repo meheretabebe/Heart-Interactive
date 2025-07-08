@@ -1,0 +1,9 @@
+<svg width="40" height="58" viewBox="0 0 40 58" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path id="Left Atrium" d="M3.5 36L5 49.5L7 50.5H11H14H16L25 57.5L29 53L33 50.5L36 49.5L37.5 45L40 38V31L37.5 26L34 19.5L31.5 15.5L29 11.5L25 7L21.5 4L18 2L16 0H12H8.5L3.5 4L0 11.5V19.5L3.5 27.5V36Z" fill="url(#paint0_linear_7_41)"/>
+<defs>
+<linearGradient id="paint0_linear_7_41" x1="20" y1="0" x2="20" y2="57.5" gradientUnits="userSpaceOnUse">
+<stop stop-color="#BF0000"/>
+<stop offset="1" stop-color="#CD2A01"/>
+</linearGradient>
+</defs>
+</svg>

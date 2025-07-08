@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Interactive Heart Activity</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f8f8f8;
+      min-height: 100vh;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+    .heart-container {
+      position: relative;
+      width: 350px;
+      height: 500px;
+      margin: 0 auto;
+      display: block;
+      left: 0;
+      right: 0;
+      top: 0;
+      transform: none;
+      overflow: visible;
+    }
+    .svg-part {
+      position: absolute;
+      top: 0;
+      left: 0;
+      cursor: pointer;
+      transition: filter 0.2s;
+      outline: none;
+      z-index: 1;
+    }
+    .svg-part:hover path,
+    .svg-part.active path {
+      stroke: #ffbf00 !important;
+      stroke-width: 3px !important;
+      filter: drop-shadow(0 0 8px #ffbf00);
+    }
+    .svg-part:hover,
+    .svg-part.active {
+      z-index: 2;
+    }
+    .svg-ignore {
+      position: absolute;
+      top: 0;
+      left: 0;
+      pointer-events: none;
+      opacity: 1;
+    }
+    .part-name {
+      margin-top: 30px;
+      font-size: 1.5em;
+      color: #b30000;
+      min-height: 2em;
+      text-align: center;
+      font-weight: bold;
+      letter-spacing: 1px;
+      z-index: 2000;
+      background: #fff8;
+      padding: 0.5em 1em;
+      border-radius: 8px;
+      position: relative;
+    }
+    .floating-label {
+      position: absolute;
+      background: #fff;
+      border: 2px solid #d3dbe6;
+      border-radius: 16px;
+      box-shadow: 0 2px 8px #0001;
+      padding: 0.5em 1.2em;
+      font-size: 1.2em;
+      font-weight: bold;
+      color: #23242a;
+      white-space: nowrap;
+      pointer-events: none;
+      z-index: 3000;
+      transition: opacity 0.2s;
+      opacity: 1;
+    }
+    .app-title {
+      font-size: 2em;
+      font-weight: bold;
+      color: #b30000;
+      margin-bottom: 0.2em;
+      margin-top: 1em;
+      text-align: center;
+    }
+    .app-instruction {
+      font-size: 1.1em;
+      color: #444;
+      margin-bottom: 1.5em;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="app-title">Heart Interactive</div>
+  <div class="app-instruction">Click a part to see its name</div>
+  <div class="heart-container" id="heartContainer">
+    <!-- SVGs will be injected here -->
+    <div id="floatingLabel" class="floating-label" style="display:none;"></div>
+  </div>
+  <script>
+    // List of SVG files and their types
+    const svgFiles = [
+      { file: 'Ignore-2.svg', ignore: true },
+      { file: 'Ignore.svg', ignore: true },
+      { file: 'Anterior Vena Cava.svg', ignore: false },
+      { file: 'Antrioventicular Valve.svg', ignore: false },
+      { file: 'Aorta.svg', ignore: false },
+      { file: 'Left Atrium.svg', ignore: false },
+      { file: 'Left Ventricle.svg', ignore: false },
+      { file: 'Posterior Vena Cava.svg', ignore: false },
+      { file: 'Pulmonary Artery.svg', ignore: false },
+      { file: 'Pulmonary Veins.svg', ignore: false },
+      { file: 'Right Atrium.svg', ignore: false },
+      { file: 'Right Ventricle.svg', ignore: false },
+      { file: 'Semilunar Valve.svg', ignore: false },
+      { file: 'Ignore-1.svg', ignore: true },
+    ];
+
+    const container = document.getElementById('heartContainer');
+    const partName = document.getElementById('partName');
+    const floatingLabel = document.getElementById('floatingLabel');
+
+    // Placement table for each SVG
+    const svgPlacement = {
+      'Left Atrium':            { x: 118,    y: 179,    w: 40,    h: 57.5 },
+      'Right Atrium':           { x: -22.5,  y: 185,    w: 65.5,  h: 108.5 },
+      'Semilunar Valve':        { x: 57,     y: 194.5,  w: 57,    h: 26.5 },
+      'Aorta':                  { x: 25.42,  y: 35.5,   w: 115.72,h: 165.42 },
+      'Posterior Vena Cava':    { x: -25.5,  y: 272.5,  w: 46.5,  h: 118.5 },
+      'Antrioventicular Valve': { x: -7.5,   y: 205.5,  w: 163.5, h: 92 },
+      'Anterior Vena Cava':     { x: -12,    y: 123,    w: 43,    h: 88 },
+      'Ignore-1':               { x: -28.18, y: 152.24, w: 231.42,h: 244.51 },
+      'Pulmonary Artery':       { x: 20.74,  y: 97.58,  w: 145.05,h: 86.33 },
+      'Left Ventricle':         { x: 90,     y: 188.5,  w: 98.5,  h: 183.5 },
+      'Ignore-2':               { x: 88.71,  y: 142.92, w: 104.21,h: 232.1 },
+      'Ignore':                 { x: -26,    y: 123.26, w: 76.33, h: 267.78 },
+      'Right Ventricle':        { x: -5.2,   y: 154.47, w: 131.88,h: 233.15 },
+      'Pulmonary Veins':        { x: -29.73, y: 172,    w: 203.23,h: 51.41 },
+    };
+
+    // Helper to fetch and inject SVGs
+    svgFiles.forEach(({ file, ignore }) => {
+      fetch(file)
+        .then(res => res.text())
+        .then(svg => {
+          if (!svg.trim()) return; // Skip empty SVGs
+          // Remove width/height from SVG to allow scaling
+          svg = svg.replace(/(width|height)="[^"]*"/g, '');
+          // Add class and data attributes
+          let div = document.createElement('div');
+          div.innerHTML = svg.trim();
+          let svgEl = div.firstChild;
+          // Get the part name from id or filename (without .svg)
+          let name = svgEl.querySelector('[id]')?.id || file.replace('.svg','');
+          // Placement
+          let placement = svgPlacement[name] || svgPlacement[file.replace('.svg','')];
+          if (placement) {
+            svgEl.style.position = 'absolute';
+            svgEl.style.left = placement.x + 'px';
+            svgEl.style.top = placement.y + 'px';
+            svgEl.style.width = placement.w + 'px';
+            svgEl.style.height = placement.h + 'px';
+          }
+          if (ignore) {
+            svgEl.classList.add('svg-ignore');
+            // Set Ignore-1 to the very front
+            if (file === 'Ignore-1.svg') {
+              svgEl.style.zIndex = '999';
+            }
+          } else {
+            svgEl.classList.add('svg-part');
+            svgEl.setAttribute('data-name', name);
+            // Bring valves to the very front
+            if (file === 'Antrioventicular Valve.svg' || file === 'Semilunar Valve.svg') {
+              svgEl.style.zIndex = '1000';
+            }
+            // Bring Left and Right Atrium just behind Ignore-1
+            if (file === 'Left Atrium.svg' || file === 'Right Atrium.svg') {
+              svgEl.style.zIndex = '998';
+            }
+            // Add click/active effect
+            svgEl.addEventListener('click', e => {
+              e.stopPropagation();
+              // No longer update partName at the top
+              // Remove active from all parts
+              document.querySelectorAll('.svg-part.active').forEach(el => el.classList.remove('active'));
+              svgEl.classList.add('active');
+              // Show floating label near the part
+              const rect = svgEl.getBoundingClientRect();
+              const containerRect = container.getBoundingClientRect();
+              floatingLabel.textContent = name;
+              floatingLabel.style.display = 'block';
+              // Position label to the right and slightly above the part
+              floatingLabel.style.left = (rect.right - containerRect.left + 12) + 'px';
+              floatingLabel.style.top = (rect.top - containerRect.top - 8) + 'px';
+            });
+          }
+          container.appendChild(svgEl);
+        });
+    });
+
+    // Reset name and active part on background click
+    container.addEventListener('click', () => {
+      document.querySelectorAll('.svg-part.active').forEach(el => el.classList.remove('active'));
+      floatingLabel.style.display = 'none';
+    });
+  </script>
+</body>
+</html> 

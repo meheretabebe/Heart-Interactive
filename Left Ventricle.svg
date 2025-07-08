@@ -1,0 +1,10 @@
+<svg width="99" height="184" viewBox="0 0 99 184" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path id="Left Ventricle " d="M0 59L5.5 23.5L10 12.5L17 0.5L27 20V29V42L17 56H23L27 53.5H33L38 56L42 59L44.5 66.5L50.5 74L53 70.5L54.5 49L65.5 47.5L70.5 62.5L79.5 72L87.5 79.5L95.5 108L98.5 143L87.5 160H83L81 169L75.5 177.5L56 184L47 173L33 148L14 111L2.5 85L0 59Z" fill="url(#paint0_radial_7_52)"/>
+<defs>
+<radialGradient id="paint0_radial_7_52" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(75.5 -75) rotate(100.468) scale(266.943 143.291)">
+<stop stop-color="#D33C00"/>
+<stop offset="0.676462" stop-color="#D74900"/>
+<stop offset="1" stop-color="#FFBF00"/>
+</radialGradient>
+</defs>
+</svg>
